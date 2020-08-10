@@ -4,7 +4,7 @@ library(rstan)
 library(foreach)
 library(doParallel)
 
-setwd("~/Dropbox/Box/LAP/Reliability/")
+setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 # Compile models
 m0 <- stan_model("Code/Stan/joint_RT_normal.stan")
