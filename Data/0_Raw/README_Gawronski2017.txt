@@ -1,0 +1,1 @@
+For Gawronski (2017) data, we used data from the Black/White Race IAT and the introversion/extraversion self-concept IAT. The data are in SPSS format.
