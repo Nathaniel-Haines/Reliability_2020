@@ -1,8 +1,5 @@
-rm(list=ls())
-
 library(rstan)
 library(foreach)
-library(doParallel)
 
 setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
@@ -22,16 +19,25 @@ data_names <- c("Study1-Flanker", "Study2-Flanker", "Study1-Stroop",
                 "Study2b-IAT")
 
 # Iterate through models and tasks
-results <- foreach(m=seq_along(model_names), .combine = "c", .packages = "rstan") %do%
-  foreach(d=data_names, .combine = "c", .packages = "rstan") %do% {
+results <- foreach(m=seq_along(model_names), .combine = "c") %do% {
+  foreach(d=data_names, .combine = "c") %do% {
+    if (model_names[m]=="shift_lognormal" & d=="Study3-Posner") {
+      tmp_seed  <- 1
+      tmp_adapt <- .9
+    } else {
+      tmp_seed  <- 43201
+      tmp_adapt <- .8
+    }
     fit <- sampling(models[[m]], 
                     data   = stan_data[[d]], 
                     iter   = 3000, 
                     warmup = 1000, 
                     chains = 3, 
                     cores  = 3,
-                    seed   = 43201)
-    saveRDS(fit, file = paste0("Data/Fitted/fit_", d, "_", model_names[m],".rds"))
+                    seed   = tmp_seed,
+                    control = list(adapt_delta = tmp_adapt))
+    saveRDS(fit, file = paste0("Data/2_Fitted/fit_", d, "_", model_names[m],".rds"))
     rm(fit)
     model_names[m]
+  }
 }

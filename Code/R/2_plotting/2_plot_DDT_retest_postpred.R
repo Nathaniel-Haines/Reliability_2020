@@ -1,11 +1,12 @@
-rm(list=ls())
-
 library(rstan)
-library(cowplot)
+library(dplyr)
 library(patchwork)
 library(bayesplot)
 
 setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
+
+# Long format input data
+dat <- readRDS("Data/1_Preprocessed/long_format_all.rds")
 
 # Generative model results
 fit <- readRDS("Data/2_Fitted/fit_Study1-DDT_hyperbolic.rds")

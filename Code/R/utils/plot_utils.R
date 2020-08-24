@@ -41,8 +41,8 @@ plot_RT <- function(pars, raw, subj, subjs, n_draws, xlim, ylim, legend) {
   color_scheme_set("red")
   samp <- sample(1:3000, n_draws, F)
   
-  pars1 <- pars$post_pred_con_t1[samp,which(subj==subjs),]
-  pars2 <- pars$post_pred_incon_t1[samp,which(subj==subjs),]
+  pars1 <- pars$post_pred_c1_t1[samp,which(subj==subjs),]
+  pars2 <- pars$post_pred_c2_t1[samp,which(subj==subjs),]
   raw1 <- raw$RT[subj,1,1,]
   raw2 <- raw$RT[subj,2,1,]
   

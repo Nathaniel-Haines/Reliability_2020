@@ -7,7 +7,7 @@ library(bayesplot)
 
 setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
-source("Code/R/utils/plot_utils_v2.R")
+source("Code/R/utils/plot_utils.R")
 
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
 
@@ -31,14 +31,14 @@ results <- foreach(d=data_names) %do% {
     # Read in data 
     fit <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_", i, ".rds")),
                           pars = c("R_mu", "R_sigma", 
-                                   "post_pred_con_t1", "post_pred_con_t2", 
-                                   "post_pred_incon_t1", "post_pred_incon_t2"))
+                                   "post_pred_c1_t1", "post_pred_c1_t2", 
+                                   "post_pred_c2_t1", "post_pred_c2_t2"))
     
     # Only save random 3 subjects for plotting (to avoid RAM problems)
-    fit$post_pred_con_t1 <- fit$post_pred_con_t1[,subjs,]
-    fit$post_pred_con_t2 <- fit$post_pred_con_t2[,subjs,]
-    fit$post_pred_incon_t1 <- fit$post_pred_incon_t1[,subjs,]
-    fit$post_pred_incon_t2 <- fit$post_pred_incon_t2[,subjs,]
+    fit$post_pred_c1_t1 <- fit$post_pred_c1_t1[,subjs,]
+    fit$post_pred_c1_t2 <- fit$post_pred_c1_t2[,subjs,]
+    fit$post_pred_c2_t1 <- fit$post_pred_c2_t1[,subjs,]
+    fit$post_pred_c2_t2 <- fit$post_pred_c2_t2[,subjs,]
     
     # Return model fit
     fits[[i]] <- fit

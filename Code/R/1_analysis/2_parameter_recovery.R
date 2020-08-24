@@ -22,7 +22,7 @@ n_trials <- c(10, 50, 100, 50, 100)
 mu_cor <- seq(-1, 1, length.out = 15)
 sd_cor <- seq(-1, 1, length.out = 15)
 con_cor <- 0
-  
+
 # Means
 mu_mean_base  <- c(-.5, -.55)
 mu_mean_delta <- c(.1, .08)
@@ -38,28 +38,28 @@ results <- foreach(i=seq_along(n_subj), .combine = "rbind") %do% {
   foreach(r=seq_along(mu_cor), .combine = "rbind") %do% {
     ## Individual-level parameters
     # For mean when c = 1
-    mu_c1 <- rmvnorm(n_subj[i], mu_mean_con, 
-                     diag(sig_mean_con) %*%
+    mu_c1 <- rmvnorm(n_subj[i], mu_mean_base, 
+                     diag(mu_sd_base) %*%
                        matrix(c(1,con_cor,con_cor,1), nrow = 2) %*% 
-                       diag(sig_mean_con))
+                       diag(mu_sd_base))
     # For sd when c = 1
-    sd_c1 <- rmvnorm(n_subj[i], mu_sd_con, 
-                     diag(sig_sd_con) %*%
+    sd_c1 <- rmvnorm(n_subj[i], sigma_mean_base, 
+                     diag(sigma_sd_base) %*%
                        matrix(c(1,con_cor,con_cor,1), nrow = 2) %*% 
-                       diag(sig_sd_con)) %>%
+                       diag(sigma_sd_base)) %>%
       exp(.)
     
     # For mean when c = 2
     mu_delta <- rmvnorm(n_subj[i], mu_mean_delta, 
-                        diag(sig_mean_delta) %*%
+                        diag(mu_sd_delta) %*%
                           matrix(c(1,mu_cor[r],mu_cor[r],1), nrow = 2) %*% 
-                          diag(sig_mean_delta))
+                          diag(mu_sd_delta))
     mu_c2 <- mu_c1 + mu_delta
     # For sd when c = 2
-    sd_delta <- rmvnorm(n_subj[i], mu_sd_delta, 
-                        diag(sig_sd_delta) %*%
+    sd_delta <- rmvnorm(n_subj[i], sigma_mean_delta, 
+                        diag(sigma_sd_delta) %*%
                           matrix(c(1,sd_cor[r],sd_cor[r],1), nrow = 2) %*% 
-                          diag(sig_sd_delta))
+                          diag(sigma_sd_delta))
     sd_c2 <- exp(log(sd_c1) + sd_delta)
     
     ## Loop through subjects and save results in long format
@@ -125,22 +125,4 @@ results <- foreach(i=seq_along(n_subj), .combine = "rbind") %do% {
   }
 }
 
-p1 <- results %>% 
-  mutate(par = ifelse(par=="R_mu", "mu", "sigma")) %>%
-  ggplot() +
-  geom_hline(yintercept = 0, linetype = 2, color = "gray") +
-  geom_line(aes(x = R_true, y = R_mu, color = type)) +
-  geom_ribbon(aes(x = R_true, ymin = R_lo, ymax = R_hi, fill = type), alpha = .3) +
-  geom_abline(intercept = 0, slope = 1, linetype = 2) +
-  scale_color_manual("Model", values = c("#8F2727", "darkgray")) +
-  scale_fill_manual("Model", values = c("#8F2727", "black")) +
-  facet_grid(c("samp_size", "par")) +
-  xlab("True Correlation") +
-  ylab("Estimated Correlation") +
-  theme_minimal(base_size = 15) +
-  theme(panel.grid = element_blank())
-
-ggsave(p1, filename = "Data/3_Plotted/par_recovery.png",
-       unit = "in", width = 7.5, height = 8, dpi = 300)
-
-
+saveRDS(results, file = "Data/2_Fitted/parameter_recovery.rds")

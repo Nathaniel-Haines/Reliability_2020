@@ -35,7 +35,10 @@ plot_data <- foreach(i=seq_along(tasks)) %do% {
   plots <- foreach(p=pars[[i]][1:2]) %do% {
     # Compute parameter expectations (i.e. posterior means)
     if (p=="sigma_i_delta") {
-      sig_delta <- post_pars[[p]] - post_pars$sigma_i_base
+      # This transformation ensure we look at the differences between
+      # the sigma estimates on the scale of the SD for each condition, which
+      # makes it comparable to the standard deviation contrast method
+      sig_delta <- exp(post_pars$sigma_i_base + post_pars[[p]]) - exp(post_pars$sigma_i_base)
       par_pooled <- apply(sig_delta, c(2,3), mean) %>%
         as.data.frame() %>%
         mutate(subj_num = row_number(),

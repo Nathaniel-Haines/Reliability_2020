@@ -11,17 +11,17 @@ parameters {
   cholesky_factor_corr[2] L_R_mu; 
   cholesky_factor_corr[2] L_R_sigma;
   
-  // Group-level parameter SDs
-  vector<lower=0>[2] sigma_mean_base;
-  vector<lower=0>[2] sigma_mean_delta;
-  vector<lower=0>[2] sigma_sd_base;
-  vector<lower=0>[2] sigma_sd_delta;
-  
   // Group-level parameter means
   vector[2] mu_mean_base;
   vector[2] mu_mean_delta;        
-  vector[2] mu_sd_base;
-  vector[2] mu_sd_delta;          
+  vector[2] sigma_mean_base;
+  vector[2] sigma_mean_delta;    
+  
+  // Group-level parameter SDs
+  vector<lower=0>[2] mu_sd_base;
+  vector<lower=0>[2] mu_sd_delta;
+  vector<lower=0>[2] sigma_sd_base;
+  vector<lower=0>[2] sigma_sd_delta; 
   
   // Individual-level parameters (before being transformed)
   matrix[N,2] mu_i_base_pr; 
@@ -41,30 +41,30 @@ transformed parameters {
   matrix[N,2] sigma_i_delta;
   
   // Construct inidividual offsets (for non-centered parameterization)
-  mu_i_delta_tilde = diag_pre_multiply(sigma_mean_delta, L_R_mu) * mu_i_delta_pr;
+  mu_i_delta_tilde = diag_pre_multiply(mu_sd_delta, L_R_mu) * mu_i_delta_pr;
   sigma_i_delta_tilde = diag_pre_multiply(sigma_sd_delta, L_R_sigma) * sigma_i_delta_pr; 
   
   // Compute individual-level parameters from non-centered parameterization
   for (i in 1:N) {
     // Congruent at time 1
-    mu_i_base[i,1] = mu_mean_base[1] + sigma_mean_base[1] * mu_i_base_pr[i,1];
+    mu_i_base[i,1] = mu_mean_base[1] + mu_sd_base[1] * mu_i_base_pr[i,1];
     // Congruent at time 2
-    mu_i_base[i,2] = mu_mean_base[2] + sigma_mean_base[2] * mu_i_base_pr[i,2];
+    mu_i_base[i,2] = mu_mean_base[2] + mu_sd_base[2] * mu_i_base_pr[i,2];
     
     // Congruent at time 1
-    sigma_i_base[i,1] = exp(mu_sd_base[1] + sigma_sd_base[1] * sigma_i_base_pr[i,1]);
+    sigma_i_base[i,1] = sigma_mean_base[1] + sigma_sd_base[1] * sigma_i_base_pr[i,1];
     // Congruent at time 2
-    sigma_i_base[i,2] = exp(mu_sd_base[2] + sigma_sd_base[2] * sigma_i_base_pr[i,2]);
+    sigma_i_base[i,2] = sigma_mean_base[2] + sigma_sd_base[2] * sigma_i_base_pr[i,2];
     
-    // Stroop effect at mu time 1
+    // Condition effect on mu at time 1
     mu_i_delta[i,1] = mu_mean_delta[1] + mu_i_delta_tilde[1,i];
-    // Stroop effect at mu time 2
+    // Condition effect on mu at time 2
     mu_i_delta[i,2] = mu_mean_delta[2] + mu_i_delta_tilde[2,i];
     
-    // Stroop effect SD at time 1
-    sigma_i_delta[i,1] = exp(log(sigma_i_base[i,1]) + mu_sd_delta[1] + sigma_i_delta_tilde[1,i]);
-    // Stroop effect SD at time 2
-    sigma_i_delta[i,2] = exp(log(sigma_i_base[i,2]) + mu_sd_delta[2] + sigma_i_delta_tilde[2,i]);
+    // Condition effect on SD at time 1
+    sigma_i_delta[i,1] = sigma_mean_delta[1] + sigma_i_delta_tilde[1,i];
+    // Condition effect on SD at time 2
+    sigma_i_delta[i,2] = sigma_mean_delta[2] + sigma_i_delta_tilde[2,i];
   }
 }
 model {
@@ -73,16 +73,16 @@ model {
   L_R_sigma ~ lkj_corr_cholesky(1); 
   
   // Priors on group-level means 
-  mu_mean_base  ~ normal(0, 1);
-  mu_mean_delta ~ normal(0, 1);
-  mu_sd_base    ~ normal(0, 1);
-  mu_sd_delta   ~ normal(0, 1); 
+  mu_mean_base     ~ normal(0, 1);
+  mu_mean_delta    ~ normal(0, 1);
+  sigma_mean_base  ~ normal(0, 1);
+  sigma_mean_delta ~ normal(0, 1); 
   
   // Priors on group-level SDs
-  sigma_mean_base  ~ normal(0, 1);
-  sigma_mean_delta ~ normal(0, 1);
-  sigma_sd_base    ~ normal(0, 1);
-  sigma_sd_delta   ~ normal(0, 1);
+  mu_sd_base     ~ normal(0, 1);
+  mu_sd_delta    ~ normal(0, 1);
+  sigma_sd_base  ~ normal(0, 1);
+  sigma_sd_delta ~ normal(0, 1);
   
   // Priors on individual-level parameters
   to_vector(mu_i_base_pr)     ~ normal(0, 1);
@@ -93,13 +93,17 @@ model {
   // For each subject
   for (i in 1:N) {
     // Congruent at time 1
-    RT[i,1,1,1:T_subj[i,1,1]] ~ normal(mu_i_base[i,1], sigma_i_base[i,1]);
+    RT[i,1,1,1:T_subj[i,1,1]] ~ normal(mu_i_base[i,1], 
+                                       exp(sigma_i_base[i,1]));
     // Incongruent at time 1
-    RT[i,2,1,1:T_subj[i,2,1]] ~ normal(mu_i_base[i,1] + mu_i_delta[i,1], sigma_i_delta[i,1]);
+    RT[i,2,1,1:T_subj[i,2,1]] ~ normal(mu_i_base[i,1] + mu_i_delta[i,1], 
+                                       exp(sigma_i_base[i,1] + sigma_i_delta[i,1]));
     // Congruent at time 2
-    RT[i,1,2,1:T_subj[i,1,2]] ~ normal(mu_i_base[i,2], sigma_i_base[i,2]);
+    RT[i,1,2,1:T_subj[i,1,2]] ~ normal(mu_i_base[i,2], 
+                                       exp(sigma_i_base[i,2]));
     // Incongruent at time 2
-    RT[i,2,2,1:T_subj[i,2,2]] ~ normal(mu_i_base[i,2] + mu_i_delta[i,2], sigma_i_delta[i,2]);
+    RT[i,2,2,1:T_subj[i,2,2]] ~ normal(mu_i_base[i,2] + mu_i_delta[i,2], 
+                                       exp(sigma_i_base[i,2] + sigma_i_delta[i,2]));
   }
 }
 generated quantities { 
@@ -131,23 +135,35 @@ generated quantities {
   for (i in 1:N) {
     // Congruent at time 1
     for (t in 1:T_subj[i,1,1]) {
-      post_pred_c1_t1[i,t] = normal_rng(mu_i_base[i,1], sigma_i_base[i,1]);
-      log_lik[i,1,1,t] = normal_lpdf(RT[i,1,1,t] | mu_i_base[i,1], sigma_i_base[i,1]);
+      post_pred_c1_t1[i,t] = normal_rng(mu_i_base[i,1], 
+                                        exp(sigma_i_base[i,1]));
+      log_lik[i,1,1,t] = normal_lpdf(RT[i,1,1,t] | 
+                                     mu_i_base[i,1], 
+                                     exp(sigma_i_base[i,1]));
     }
     // Incongruent at time 1
     for (t in 1:T_subj[i,2,1]) {
-      post_pred_c2_t1[i,t] = normal_rng(mu_i_base[i,1] + mu_i_delta[i,1], sigma_i_delta[i,1]);
-      log_lik[i,2,1,t] = normal_lpdf(RT[i,2,1,t] | mu_i_base[i,1] + mu_i_delta[i,1], sigma_i_delta[i,1]);
+      post_pred_c2_t1[i,t] = normal_rng(mu_i_base[i,1] + mu_i_delta[i,1], 
+                                        exp(sigma_i_base[i,1] + sigma_i_delta[i,1]));
+      log_lik[i,2,1,t] = normal_lpdf(RT[i,2,1,t] | 
+                                     mu_i_base[i,1] + mu_i_delta[i,1], 
+                                     exp(sigma_i_base[i,1] + sigma_i_delta[i,1]));
     }
     // Congruent at time 2
     for (t in 1:T_subj[i,1,2]) {
-      post_pred_c1_t2[i,t] = normal_rng(mu_i_base[i,2], sigma_i_base[i,2]);
-      log_lik[i,1,2,t] = normal_lpdf(RT[i,1,2,t] | mu_i_base[i,2], sigma_i_base[i,2]);
+      post_pred_c1_t2[i,t] = normal_rng(mu_i_base[i,2], 
+                                        exp(sigma_i_base[i,2]));
+      log_lik[i,1,2,t] = normal_lpdf(RT[i,1,2,t] | 
+                                     mu_i_base[i,2], 
+                                     exp(sigma_i_base[i,2]));
     }
     // Incongruent at time 2
     for (t in 1:T_subj[i,2,2]) {
-      post_pred_c2_t2[i,t] = normal_rng(mu_i_base[i,2] + mu_i_delta[i,2], sigma_i_delta[i,2]);
-      log_lik[i,2,2,t] = normal_lpdf(RT[i,2,2,t] | mu_i_base[i,2] + mu_i_delta[i,2], sigma_i_delta[i,2]);
+      post_pred_c2_t2[i,t] = normal_rng(mu_i_base[i,2] + mu_i_delta[i,2], 
+                                        exp(sigma_i_base[i,2] + sigma_i_delta[i,2]));
+      log_lik[i,2,2,t] = normal_lpdf(RT[i,2,2,t] | 
+                                     mu_i_base[i,2] + mu_i_delta[i,2], 
+                                     exp(sigma_i_base[i,2] + sigma_i_delta[i,2]));
     }
   }
 } 
