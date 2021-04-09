@@ -30,7 +30,7 @@ results <- foreach(d=data_names) %do% {
   fits <- list()
   for (i in fit_names) {
     # Read in data 
-    fit <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_jointFull_", i, "500iter_200warm.rds")),
+    fit <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSingle_", i, ".rds")),
                           pars = c("R_mu", "R_sigma", "mu_i", "sigma_i", 
                                    "post_pred_c1_t1", "post_pred_c1_t2", 
                                    "post_pred_c2_t1", "post_pred_c2_t2"))
@@ -89,17 +89,17 @@ posner3 <- results$`Study3-Posner`$test_retest | results$`Study3-Posner`$post_pr
 iat1a <- results$`Study1a-IAT`$test_retest | results$`Study1a-IAT`$post_pred
 iat2b <- results$`Study2b-IAT`$test_retest | results$`Study2b-IAT`$post_pred
 
-ggsave(stroop1, filename = "Data/3_Plotted/jointFull_stroop1.pdf", unit = "in",
+ggsave(stroop1, filename = "Data/3_Plotted/jointSingle_stroop1.pdf", unit = "in",
        width = 12, height = 6)
-ggsave(stroop2, filename = "Data/3_Plotted/jointFull_stroop2.pdf", unit = "in",
+ggsave(stroop2, filename = "Data/3_Plotted/jointSingle_stroop2.pdf", unit = "in",
        width = 12, height = 6)
-ggsave(flank1, filename = "Data/3_Plotted/jointFull_flank1.pdf", unit = "in",
+ggsave(flank1, filename = "Data/3_Plotted/jointSingle_flank1.pdf", unit = "in",
        width = 12, height = 6)
-ggsave(flank2, filename = "Data/3_Plotted/jointFull_flank2.pdf", unit = "in",
+ggsave(flank2, filename = "Data/3_Plotted/jointSingle_flank2.pdf", unit = "in",
        width = 12, height = 6)
-ggsave(posner3, filename = "Data/3_Plotted/jointFull_posner3.pdf", unit = "in",
+ggsave(posner3, filename = "Data/3_Plotted/jointSingle_posner3.pdf", unit = "in",
        width = 12, height = 6)
-ggsave(iat1a, filename = "Data/3_Plotted/jointFull_iat1a.pdf", unit = "in",
+ggsave(iat1a, filename = "Data/3_Plotted/jointSingle_iat1a.pdf", unit = "in",
        width = 12, height = 6)
-ggsave(iat2b, filename = "Data/3_Plotted/jointFull_iat2b.pdf", unit = "in",
+ggsave(iat2b, filename = "Data/3_Plotted/jointSingle_iat2b.pdf", unit = "in",
        width = 12, height = 6)
