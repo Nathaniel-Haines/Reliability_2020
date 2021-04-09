@@ -57,8 +57,10 @@ mle_ddt <- function(par, data, subj, time) {
   sum(-1*ll)
 }
 
+# Get data
 ddt_dat <- stan_data$`Study1-DDT`
 
+# Estimate MLE for k and c
 mle_results <- foreach(subj=1:ddt_dat$N, .combine = "rbind") %do% {
   # set seed
   set.seed(43202)

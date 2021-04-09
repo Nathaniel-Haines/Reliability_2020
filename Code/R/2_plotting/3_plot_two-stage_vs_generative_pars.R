@@ -106,7 +106,9 @@ plot_data <- foreach(i=seq_along(tasks)) %do% {
       geom_line(aes(group = subj_num), size = 1/4) +
       geom_point(aes(group = subj_num, color = pooled)) +
       scale_color_manual("Pooled?",
-                         values = c("#990000", "#fee8c8")) +
+                         values = c("darkgray", "#990000")) +
+      scale_fill_manual(values = c("darkgray", "#b5000c")) +
+      scale_alpha_manual(values = c(1/10, 1/10)) +
       theme_minimal(base_size = 15) +
       theme(panel.grid = element_blank(),
             legend.position = "none")
@@ -115,7 +117,7 @@ plot_data <- foreach(i=seq_along(tasks)) %do% {
   plots
 }
 
-p1 <- (plot_data[[1]][[1]] | plot_data[[1]][[2]]+xlim(-.08, .18)+ylim(-.1, .17)) /
+p1 <- (plot_data[[1]][[1]] | plot_data[[1]][[2]]+xlim(-0.1, .19)+ylim(-.12, .18)) /
   (plot_data[[2]][[1]] | plot_data[[2]][[2]]) /
   (plot_data[[3]][[1]] | plot_data[[3]][[2]])
 

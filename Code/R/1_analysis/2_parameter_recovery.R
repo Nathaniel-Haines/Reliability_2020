@@ -34,6 +34,7 @@ sigma_mean_delta <- c(.12, .11)
 sigma_sd_base    <- c(.19, .2)
 sigma_sd_delta   <- c(.11, .09)
 
+# Loop through each of simulation grid-points, simulating data then fiting model 
 results <- foreach(i=seq_along(n_subj), .combine = "rbind") %do% {
   foreach(r=seq_along(mu_cor), .combine = "rbind") %do% {
     ## Individual-level parameters
