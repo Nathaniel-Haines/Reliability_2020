@@ -4,9 +4,9 @@ library(foreach)
 setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 # Compile models
-m0 <- stan_model("Code/Stan/jointFull_RT_normal.stan")
-m1 <- stan_model("Code/Stan/jointFull_RT_lognormal.stan")
-m2 <- stan_model("Code/Stan/jointFull_RT_shiftlnorm.stan")
+m0 <- stan_model("Code/Stan/jointSingle_RT_normal.stan")
+m1 <- stan_model("Code/Stan/jointSingle_RT_lognormal.stan")
+m2 <- stan_model("Code/Stan/jointSingle_RT_shiftlnorm.stan")
 
 # Load preprocessed data
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
