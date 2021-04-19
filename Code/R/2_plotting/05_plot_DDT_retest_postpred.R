@@ -3,8 +3,6 @@ library(dplyr)
 library(patchwork)
 library(bayesplot)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # Long format input data
 dat <- readRDS("Data/1_Preprocessed/long_format_all.rds")
 

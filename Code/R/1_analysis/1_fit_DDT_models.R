@@ -1,12 +1,6 @@
 library(rstan)
 library(dplyr)
-library(tidyr)
 library(foreach)
-library(ggplot2)
-library(cowplot)
-library(patchwork)
-
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 ## Generative model
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")

@@ -1,8 +1,6 @@
 library(dplyr)
 library(ggplot2)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 results <- readRDS("Data/2_Fitted/parameter_recovery.rds")
 
 p1 <- results %>% 

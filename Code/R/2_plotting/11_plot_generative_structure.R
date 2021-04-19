@@ -1,5 +1,3 @@
-rm(list=ls())
-
 library(rstan)
 library(cowplot)
 library(patchwork)
@@ -8,8 +6,6 @@ library(gridExtra)
 library(grid)
 library(dplyr)
 library(scales)
-
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 # Read in raw data
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")

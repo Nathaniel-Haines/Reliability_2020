@@ -5,8 +5,6 @@ library(ggplot2)
 library(cowplot)
 library(patchwork)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # Range of values for plotting changes in mean
 time <- seq(0, 2.5, length.out = 1000)
 mu_vals <- seq(-2, .5, length.out = 10)

@@ -2,8 +2,6 @@ library(dplyr)
 library(foreach)
 library(haven)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # task-specific preprocessing functions
 source("Code/R/0_Preprocessing/utils.R")
 

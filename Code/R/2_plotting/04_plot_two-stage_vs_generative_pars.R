@@ -9,8 +9,6 @@ rowSDs <- function(x, na.rm = T) {
   apply(x, 1, sd, na.rm = na.rm)
 }
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # Tasks and parameters within each model for plotting
 tasks <- c("Study1-Stroop_normal", 
            "Study2b-IAT_normal", 

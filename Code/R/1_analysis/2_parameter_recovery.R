@@ -4,8 +4,6 @@ library(dplyr)
 library(foreach)
 library(patchwork)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # For transforming long data to stan-ready format
 source("Code/R/0_Preprocessing/utils.R")
 

@@ -3,8 +3,6 @@ library(dplyr)
 library(foreach)
 library(hBayesDM)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # Task, model names, and parameters
 models <- c("Study1-Stroop_normal", "Study1-Stroop_lognormal", 
            "Study1-Stroop_shift_lognormal")

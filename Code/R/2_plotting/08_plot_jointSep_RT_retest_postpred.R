@@ -1,12 +1,8 @@
-rm(list=ls())
-
 library(rstan)
 library(cowplot)
 library(patchwork)
 library(bayesplot)
 library(foreach)
-
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 source("Code/R/utils/plot_utils_jointSep.R")
 

@@ -1,9 +1,5 @@
-rm(list=ls())
-
 library(patchwork)
 library(EnvStats)
-
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 # Read in raw data
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")

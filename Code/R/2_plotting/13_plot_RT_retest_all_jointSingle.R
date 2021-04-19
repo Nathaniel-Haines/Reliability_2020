@@ -1,5 +1,3 @@
-rm(list=ls())
-
 library(rstan)
 library(cowplot)
 library(patchwork)
@@ -12,8 +10,6 @@ library(foreach)
 rowSDs <- function(x, na.rm=T) {
   apply(x, 1, sd, na.rm = na.rm)
 }
-
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
 
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
 

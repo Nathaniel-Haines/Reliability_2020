@@ -1,8 +1,6 @@
 library(rstan)
 library(foreach)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # Compile models
 m0 <- stan_model("Code/Stan/jointSingle_RT_normal.stan")
 m1 <- stan_model("Code/Stan/jointSingle_RT_lognormal.stan")

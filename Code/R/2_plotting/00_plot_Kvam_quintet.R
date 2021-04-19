@@ -1,7 +1,5 @@
 library(ggplot2)
 
-setwd("~/Dropbox/Box/GitHub/Reliability_2020/")
-
 # Function for normal mixture density
 dmixnorm <- function(x, mean1, mean2) {
   dnorm(x, mean = mean1)*.5 + dnorm(x, mean = mean2)*.5
