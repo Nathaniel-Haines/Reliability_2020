@@ -4,7 +4,7 @@ library(patchwork)
 library(bayesplot)
 library(foreach)
 
-source("Code/R/utils/plot_utils_jointFull.R")
+source("Code/R/utils/plot_utils_jointSingle.R")
 
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
 
