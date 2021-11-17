@@ -39,7 +39,8 @@ plot_retest <- function(pars, parameter, task, samp_data, legend) {
 
 plot_RT <- function(pars, raw, subj, subjs, n_draws, xlim, ylim, legend) {
   color_scheme_set("red")
-  samp <- sample(1:3000, n_draws, F)
+  n_samples <- dim(pars$post_pred_c1_t1)[1]
+  samp <- sample(1:n_samples, n_draws, F)
   
   pars1 <- pars$post_pred_c1_t1[samp,which(subj==subjs),]
   pars2 <- pars$post_pred_c2_t1[samp,which(subj==subjs),]
