@@ -14,6 +14,8 @@ Please reach out if you have any questions!
 
 ## Necessary Software Installations
 
+NOTE: the `renv` project was all run with R 4.3.3. 
+
 First, you will need to ensure that Stan and cmdstanr are properly downloaded and installed. You can find a guide on installing these here: https://mc-stan.org/cmdstanr/. 
 
 After checking that `cmdstanr` is installed properly, ensure that `renv` has properly boostrapped and installed all packages without error. This should be done automatically when loading the R project, so you just need to check that no errors were encountered during install. 
