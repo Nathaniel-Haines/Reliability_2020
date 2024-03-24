@@ -1,4 +1,3 @@
-library(rstan)
 library(cowplot)
 library(patchwork)
 library(bayesplot)
@@ -26,10 +25,7 @@ results <- foreach(d=data_names) %do% {
   fits <- list()
   for (i in fit_names) {
     # Read in data 
-    fit <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSep_", i, "500iter_200warm.rds")),
-                          pars = c("R_mu_delta", "R_sigma_delta",
-                                   "post_pred_c1_t1", "post_pred_c1_t2", 
-                                   "post_pred_c2_t1", "post_pred_c2_t2"))
+    fit <- readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSep_", i, "500iter_200warm.rds"))
     
     # Only save random 3 subjects for plotting (to avoid RAM problems)
     fit$post_pred_c1_t1 <- fit$post_pred_c1_t1[,subjs,]

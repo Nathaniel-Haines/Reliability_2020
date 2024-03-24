@@ -105,19 +105,19 @@ model {
   for (i in 1:N) {
     // Congruent at time 1
     for (t in 1:T_subj[i,1,1]) {
-      RT[i,1,1,t] ~ shiftlnorm_lpdf(ndt_i[i,1], mu_i[i,1], sigma_i[i,1]);
+      RT[i,1,1,t] ~ shiftlnorm(ndt_i[i,1], mu_i[i,1], sigma_i[i,1]);
     }
     // Incongruent at time 1
     for (t in 1:T_subj[i,2,1]) {
-      RT[i,2,1,t] ~ shiftlnorm_lpdf(ndt_i[i,1], mu_i[i,2], sigma_i[i,2]);
+      RT[i,2,1,t] ~ shiftlnorm(ndt_i[i,1], mu_i[i,2], sigma_i[i,2]);
     }
     // Congruent at time 2
     for (t in 1:T_subj[i,1,2]) {
-      RT[i,1,2,t] ~ shiftlnorm_lpdf(ndt_i[i,2], mu_i[i,3], sigma_i[i,3]);
+      RT[i,1,2,t] ~ shiftlnorm(ndt_i[i,2], mu_i[i,3], sigma_i[i,3]);
     }
     // Incongruent at time 2
     for (t in 1:T_subj[i,2,2]) {
-      RT[i,2,2,t] ~ shiftlnorm_lpdf(ndt_i[i,2], mu_i[i,4], sigma_i[i,4]);
+      RT[i,2,2,t] ~ shiftlnorm(ndt_i[i,2], mu_i[i,4], sigma_i[i,4]);
     }
   }
 }

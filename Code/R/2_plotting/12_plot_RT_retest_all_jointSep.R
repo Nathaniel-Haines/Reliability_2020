@@ -24,8 +24,7 @@ results <- foreach(d=data_names, .combine = "rbind") %do% {
   samp_data <- stan_data[[d]]
   tmp <- foreach(i=fit_names, .combine = "rbind") %do% {
     # Extract generative model estimates
-    pars <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSep_", i, ".rds")),
-                           pars = c("R_mu_delta", "R_sigma_delta"))
+    pars <- readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSep_", i, ".rds"))
     
     # Compute posterior means and 95% HDIs for both mu and sigma
     data.frame(Model     = i,

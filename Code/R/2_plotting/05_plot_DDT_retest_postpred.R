@@ -7,8 +7,7 @@ library(bayesplot)
 dat <- readRDS("Data/1_Preprocessed/long_format_all.rds")
 
 # Generative model results
-fit <- readRDS("Data/2_Fitted/fit_Study1-DDT_hyperbolic.rds")
-pars <- rstan::extract(fit)
+pars <- readRDS("Data/2_Fitted/fit_Study1-DDT_hyperbolic.rds")
 
 # Two-stage approach results
 mle_results <- readRDS("Data/2_Fitted/fit_Study1-DDT_hyperbolic_MLE.rds")
