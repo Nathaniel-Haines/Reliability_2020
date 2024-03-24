@@ -1,10 +1,11 @@
-library(rstan)
+library(cmdstanr)
 library(foreach)
+library(posterior)
 
 # Compile models
-m0 <- stan_model("Code/Stan/jointSingle_RT_normal.stan")
-m1 <- stan_model("Code/Stan/jointSingle_RT_lognormal.stan")
-m2 <- stan_model("Code/Stan/jointSingle_RT_shiftlnorm.stan")
+m0 <- cmdstan_model("Code/Stan/jointSingle_RT_normal.stan")
+m1 <- cmdstan_model("Code/Stan/jointSingle_RT_lognormal.stan")
+m2 <- cmdstan_model("Code/Stan/jointSingle_RT_shiftlnorm.stan")
 
 # Load preprocessed data
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
@@ -23,17 +24,28 @@ tmp_adapt <- .8
 # Iterate through models and tasks
 results <- foreach(m=seq_along(model_names), .combine = "c") %do% {
   foreach(d=data_names, .combine = "c") %do% {
-    fit <- sampling(models[[m]], 
-                    data   = stan_data[[d]], 
-                    iter   = 3000, 
-                    warmup = 1000, 
-                    chains = 3, 
-                    cores  = 3,
-                    seed   = tmp_seed,
-                    control = list(adapt_delta = tmp_adapt))
-    saveRDS(fit, file = paste0("Data/2_Fitted/fit_", d, "_jointSingle_", model_names[m],".rds"))
-    rm(fit)
-    gc()
+    fit <- models[[m]]$sample( 
+      stan_data[[d]], 
+      iter_sampling = 750, 
+      iter_warmup = 250, 
+      chains = 8,
+      parallel_chains = 8,
+      seed = tmp_seed,
+      adapt_delta = tmp_adapt
+    )
+    rvars_pars <- as_draws_rvars(
+      fit$draws(
+        c(
+          "R_mu", "R_sigma", 
+          "mu_i", "sigma_i",
+          "post_pred_c1_t1", "post_pred_c1_t2", 
+          "post_pred_c2_t1", "post_pred_c2_t2"
+        )
+      )
+    )
+    pars <- lapply(rvars_pars, draws_of)
+    saveRDS(pars, file = paste0("Data/2_Fitted/fit_", d, "_jointSingle_", model_names[m],".rds"))
+    rm(fit, pars); gc()
     model_names[m]
   }
 }

@@ -1,21 +1,30 @@
-library(rstan)
+library(cmdstanr)
 library(dplyr)
 library(foreach)
+library(posterior)
 
 ## Generative model
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
-m0 <- stan_model("Code/Stan/joint_DDT_hyperbolic.stan")
+m0 <- cmdstan_model("Code/Stan/joint_DDT_hyperbolic.stan")
 
-fit <- sampling(m0, 
-                data   = stan_data$`Study1-DDT`, 
-                iter   = 3000, 
-                warmup = 1000, 
-                chains = 3, 
-                cores  = 3,
-                seed   = 43201)
+fit <- m0$sample( 
+  stan_data$`Study1-DDT`, 
+  iter_sampling = 750, 
+  iter_warmup = 250, 
+  chains = 8,
+  parallel_chains = 8,
+  seed = 43201
+)
+
+rvars_pars <- as_draws_rvars(
+  fit$draws(
+    c("R_k", "R_c", "k", "c")
+  )
+)
+pars <- lapply(rvars_pars, draws_of)
 
 # Save out fit
-saveRDS(fit, file = "Data/2_Fitted/fit_Study1-DDT_hyperbolic.rds")
+saveRDS(pars, file = "Data/2_Fitted/fit_Study1-DDT_hyperbolic.rds")
 
 ## Two-stage approach
 # Softmax function
@@ -61,31 +70,35 @@ mle_results <- foreach(subj=1:ddt_dat$N, .combine = "rbind") %do% {
   
   # Use optim to minimize the (minus) log-likelihood function
   # Time 1
-  mle_t1 <- optim(par    = c(0.05, 0.5),    # Initial guess for k and c
-                  fn     = mle_ddt,         # Function we are minimizing
-                  method = "L-BFGS-B",      # Specific algorithm used
-                  lower  = c(0.0001, 0.0001),         # Lower bounds for k and c 
-                  upper  = c(1, 1.5),       # Upper bound for k and c 
-                  data   = ddt_dat,         # choice/task data
-                  subj   = subj,            # current subject 
-                  time   = 1)               # timepoint
+  mle_t1 <- optim(
+    par    = c(0.05, 0.5),    # Initial guess for k and c
+    fn     = mle_ddt,         # Function we are minimizing
+    method = "L-BFGS-B",      # Specific algorithm used
+    lower  = c(0.0001, 0.0001),         # Lower bounds for k and c 
+    upper  = c(1, 1.5),       # Upper bound for k and c 
+    data   = ddt_dat,         # choice/task data
+    subj   = subj,            # current subject 
+    time   = 1                # timepoint
+  )               
   # Time 2
-  mle_t2 <- optim(par    = c(0.05, 0.5),    # Initial guess for k and c
-                  fn     = mle_ddt,         # Function we are minimizing
-                  method = "L-BFGS-B",      # Specific algorithm used
-                  lower  = c(0.0001, 0.0001),         # Lower bounds for k and c 
-                  upper  = c(1, 1.5),       # Upper bound for k and c 
-                  data   = ddt_dat,         # choice/task data
-                  subj   = subj,            # current subject 
-                  time   = 2)               # timepoint
+  mle_t2 <- optim(
+    par    = c(0.05, 0.5),    # Initial guess for k and c
+    fn     = mle_ddt,         # Function we are minimizing
+    method = "L-BFGS-B",      # Specific algorithm used
+    lower  = c(0.0001, 0.0001),         # Lower bounds for k and c 
+    upper  = c(1, 1.5),       # Upper bound for k and c 
+    data   = ddt_dat,         # choice/task data
+    subj   = subj,            # current subject 
+    time   = 2                # timepoint
+  )               
   
   # Return estimates
-  data.frame(subj_num = rep(subj, 2),
-             Time     = 1:2,
-             k        = c(mle_t1$par[1], 
-                          mle_t2$par[1]),
-             c        = c(mle_t1$par[2], 
-                          mle_t2$par[2]))
+  data.frame(
+    subj_num = rep(subj, 2),
+    Time = 1:2,
+    k = c(mle_t1$par[1], mle_t2$par[1]),
+    c = c(mle_t1$par[2], mle_t2$par[2])
+  )
 }
 
 # Save out MLE fit

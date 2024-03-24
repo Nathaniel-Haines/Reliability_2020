@@ -1,17 +1,33 @@
-library(rstan)
 library(cowplot)
 library(patchwork)
 library(bayesplot)
+library(ggplot2)
+library(foreach)
 
 source("Code/R/utils/plot_utils.R")
 
 stan_data <- readRDS("Data/1_Preprocessed/stan_ready_all.rds")
 
-fit_names <- c("normal", "lognormal", "shift_lognormal")
+fit_names <- c("normal", "lognormal", "shift_lognormal", "shift_lognormal_mix")
 data_names <- c("Study1-Stroop", "Study2-Stroop", 
                 "Study1-Flanker", "Study2-Flanker", 
                 "Study3-Posner", 
                 "Study1a-IAT", "Study2b-IAT")
+
+xlim_map <- function(dataset) {
+  return(
+    switch(
+      dataset,
+      "Study1-Stroop" = c(0, 2.5),
+      "Study2-Stroop" = c(0, 2.5),
+      "Study1-Flanker" = c(0, 1.5),
+      "Study2-Flanker" = c(0, 1.5),
+      "Study3-Posner" = c(0, 1),
+      "Study1a-IAT" = c(0, 4),
+      "Study2b-IAT" = c(0, 4)
+    )
+  )
+} 
 
 # Results
 results <- foreach(d=data_names) %do% {
@@ -25,10 +41,7 @@ results <- foreach(d=data_names) %do% {
   fits <- list()
   for (i in fit_names) {
     # Read in data 
-    fit <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_", i, ".rds")),
-                          pars = c("R_mu", "R_sigma", 
-                                   "post_pred_c1_t1", "post_pred_c1_t2", 
-                                   "post_pred_c2_t1", "post_pred_c2_t2"))
+    fit <- readRDS(paste0("Data/2_Fitted/fit_", d, "_", i, ".rds"))
     
     # Only save random 3 subjects for plotting (to avoid RAM problems)
     fit$post_pred_c1_t1 <- fit$post_pred_c1_t1[,subjs,]
@@ -54,18 +67,21 @@ results <- foreach(d=data_names) %do% {
   # Posterior predictions for RTs
   subj <- subjs[1]
   p1 <- plot_RT(pars = fits[[1]], raw = samp_data, subj = subj, 
-                subjs = subjs, n_draws = 100, xlim = c(-1, 4),
+                subjs = subjs, xlim = xlim_map(d),
                 legend = "none")
   p2 <- plot_RT(pars = fits[[2]], raw = samp_data, subj = subj, 
-                subjs = subjs, n_draws = 100, xlim = c(-1, 4),
+                subjs = subjs, xlim = xlim_map(d),
                 legend = "right")
   p3 <- plot_RT(pars = fits[[3]], raw = samp_data, subj = subj, 
-                subjs = subjs, n_draws = 100, xlim = c(-1, 4),
+                subjs = subjs, xlim = xlim_map(d),
                 legend = "none")
-  pp_plot <- (p1 / p2 / p3)
+  p4 <- plot_RT(pars = fits[[4]], raw = samp_data, subj = subj, 
+                subjs = subjs, xlim = xlim_map(d),
+                legend = "none")
+  pp_plot <- (p1 / p2 / p3 / p4)
   
   # Return list
-  rm(fits)
+  rm(fits); gc()
   list(test_retest = tr_plot, post_pred = pp_plot)
 }
 

@@ -18,7 +18,7 @@ pre_stp_flk_psr <- function(x) {
   
   # Create RT data array for stan; dims = (subject, condition, time, trial)
   RT <- correct <- array(0, dim = c(n_subj, n_cond, n_time, T_max))
-  T_subj <- RT_min <- array(NA, dim = c(n_subj, n_cond, n_time))
+  T_subj <- RT_min <- RT_max <- array(NA, dim = c(n_subj, n_cond, n_time))
   for (i in 1:n_subj) {
     # Number of trials per condition/timpoint
     c0_t1 <- T_subj[i, 1, 1] <- with(T_subj_all, n_trials[subj_num==i & Condition==0 & Time==1])
@@ -29,18 +29,22 @@ pre_stp_flk_psr <- function(x) {
     # Choice and RTs for congruent condition at time 1
     RT[i, 1, 1, 1:c0_t1]      <- with(tmp_data, RT[subj_num==i & Condition==0 & Time==1])
     RT_min[i, 1, 1]           <- min(RT[i, 1, 1, 1:c0_t1])
+    RT_max[i, 1, 1]           <- max(RT[i, 1, 1, 1:c0_t1])
     correct[i, 1, 1, 1:c0_t1] <- with(tmp_data, Correct[subj_num==i & Condition==0 & Time==1])
     # Choice and RTs for incongruent condition at time 1
     RT[i, 2, 1, 1:c2_t1]      <- with(tmp_data, RT[subj_num==i & Condition==2 & Time==1])
     RT_min[i, 2, 1]           <- min(RT[i, 2, 1, 1:c2_t1])
+    RT_max[i, 2, 1]           <- max(RT[i, 2, 1, 1:c2_t1])
     correct[i, 2, 1, 1:c2_t1] <- with(tmp_data, Correct[subj_num==i & Condition==2 & Time==1])
     # Choice and RTs for congruent condition at time 2
     RT[i, 1, 2, 1:c0_t2]      <- with(tmp_data, RT[subj_num==i & Condition==0 & Time==2])
     RT_min[i, 1, 2]           <- min(RT[i, 1, 2, 1:c0_t2])
+    RT_max[i, 1, 2]           <- max(RT[i, 1, 2, 1:c0_t2])
     correct[i, 1, 2, 1:c0_t2] <- with(tmp_data, Correct[subj_num==i & Condition==0 & Time==2])
     # Choice and RTs for incongruent condition at time 2
     RT[i, 2, 2, 1:c2_t2]      <- with(tmp_data, RT[subj_num==i & Condition==2 & Time==2])
     RT_min[i, 2, 2]           <- min(RT[i, 2, 2, 1:c2_t2])
+    RT_max[i, 2, 2]           <- max(RT[i, 2, 2, 1:c2_t2])
     correct[i, 2, 2, 1:c2_t2] <- with(tmp_data, Correct[subj_num==i & Condition==2 & Time==2])
   }
   
@@ -52,6 +56,7 @@ pre_stp_flk_psr <- function(x) {
        T_subj  = T_subj,
        RT      = RT,
        RT_min  = RT_min,
+       RT_max  = RT_max,
        correct = correct)
 }
 
@@ -74,7 +79,7 @@ pre_iat <- function(x) {
   
   # Create RT data array for stan; dims = (subject, condition, time, trial)
   RT <- correct <- array(0, dim = c(n_subj, n_cond, n_time, T_max))
-  T_subj <- RT_min <- array(NA, dim = c(n_subj, n_cond, n_time))
+  T_subj <- RT_min <- RT_max <-array(NA, dim = c(n_subj, n_cond, n_time))
   for (i in 1:n_subj) {
     # Number of trials per condition/timpoint
     c0_t1 <- T_subj[i, 1, 1] <- with(T_subj_all, n_trials[subj_num==subj_ids[i] & Condition==1 & Time==1])
@@ -85,18 +90,22 @@ pre_iat <- function(x) {
     # Choice and RTs for congruent condition at time 1
     RT[i, 1, 1, 1:c0_t1]      <- with(tmp_data, RT[subj_num==subj_ids[i] & Condition==1 & Time==1])
     RT_min[i, 1, 1]           <- min(RT[i, 1, 1, 1:c0_t1])
+    RT_max[i, 1, 1]           <- max(RT[i, 1, 1, 1:c0_t1])
     correct[i, 1, 1, 1:c0_t1] <- with(tmp_data, Correct[subj_num==subj_ids[i] & Condition==1 & Time==1])
     # Choice and RTs for incongruent condition at time 1
     RT[i, 2, 1, 1:c2_t1]      <- with(tmp_data, RT[subj_num==subj_ids[i] & Condition==2 & Time==1])
     RT_min[i, 2, 1]           <- min(RT[i, 2, 1, 1:c2_t1])
+    RT_max[i, 2, 1]           <- max(RT[i, 2, 1, 1:c2_t1])
     correct[i, 2, 1, 1:c2_t1] <- with(tmp_data, Correct[subj_num==subj_ids[i] & Condition==2 & Time==1])
     # Choice and RTs for congruent condition at time 2
     RT[i, 1, 2, 1:c0_t2]      <- with(tmp_data, RT[subj_num==subj_ids[i] & Condition==1 & Time==2])
     RT_min[i, 1, 2]           <- min(RT[i, 1, 2, 1:c0_t2])
+    RT_max[i, 1, 2]           <- max(RT[i, 1, 2, 1:c0_t2])
     correct[i, 1, 2, 1:c0_t2] <- with(tmp_data, Correct[subj_num==subj_ids[i] & Condition==1 & Time==2])
     # Choice and RTs for incongruent condition at time 2
     RT[i, 2, 2, 1:c2_t2]      <- with(tmp_data, RT[subj_num==subj_ids[i] & Condition==2 & Time==2])
     RT_min[i, 2, 2]           <- min(RT[i, 2, 2, 1:c2_t2])
+    RT_max[i, 2, 2]           <- max(RT[i, 2, 2, 1:c2_t2])
     correct[i, 2, 2, 1:c2_t2] <- with(tmp_data, Correct[subj_num==subj_ids[i] & Condition==2 & Time==2])
   }
   
@@ -108,6 +117,7 @@ pre_iat <- function(x) {
        T_subj  = T_subj,
        RT      = RT,
        RT_min  = RT_min,
+       RT_max  = RT_max,
        correct = correct)
 }
 

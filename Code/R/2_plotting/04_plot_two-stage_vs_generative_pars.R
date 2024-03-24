@@ -1,4 +1,3 @@
-library(rstan)
 library(dplyr)
 library(tidyr)
 library(foreach)
@@ -25,9 +24,7 @@ mle_data <- readRDS("Data/2_Fitted/fit_Study1-DDT_hyperbolic_MLE.rds")
 
 plot_data <- foreach(i=seq_along(tasks)) %do% {
   # Extract generative model parameters
-  post_pars <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", 
-                                             tasks[i], ".rds")), 
-                       pars = pars[[i]])
+  post_pars <- readRDS(paste0("Data/2_Fitted/fit_", tasks[i], ".rds"))
   
   # Loop through each parameter of interest
   plots <- foreach(p=pars[[i]][1:2]) %do% {
@@ -89,18 +86,18 @@ plot_data <- foreach(i=seq_along(tasks)) %do% {
     # Pooling figure
     par_pooling <- bind_rows(par_unpooled, par_pooled) %>%
       mutate(subj_num = as.factor(subj_num)) %>%
-      ggplot(aes(x = V1, y = V2)) +
+      ggplot(aes(x = V1, y = V2, fill = pooled)) +
       geom_abline(intercept = 0, slope = 1, linetype = 2, color = "black", size = 1) +
-      stat_ellipse(geom="polygon", type="norm", level=1/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=2/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=3/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=4/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=5/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=6/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=7/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=8/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=9/10, size=0, alpha=1/10, fill="gray") +
-      stat_ellipse(geom="polygon", type="norm", level=.99, size=0, alpha=1/10, fill="gray") +
+      stat_ellipse(geom="polygon", type="norm", level=1/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=2/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=3/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=4/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=5/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=6/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=7/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=8/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=9/10, size=0, alpha=1/10) +
+      stat_ellipse(geom="polygon", type="norm", level=.99, size=0, alpha=1/10) +
       geom_line(aes(group = subj_num), size = 1/4) +
       geom_point(aes(group = subj_num, color = pooled)) +
       scale_color_manual("Pooled?",

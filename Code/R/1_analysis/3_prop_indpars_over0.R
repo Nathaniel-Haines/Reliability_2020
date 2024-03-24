@@ -17,9 +17,7 @@ hdi_inc0 <- function(x) {
 # Loop through, determine how many people show the "Stroop effect"
 eff_dat <- foreach(i=seq_along(models), .combine = "rbind") %do% {
   # Extract generative model parameters
-  post_pars <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", 
-                                             models[i], ".rds")), 
-                              pars = pars)
+  post_pars <- readRDS(paste0("Data/2_Fitted/fit_", models[i], ".rds"))
   
   # Person-level parameters
   mu_delta  <- post_pars$mu_i_delta[,,1]

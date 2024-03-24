@@ -3,7 +3,7 @@ library(foreach)
 library(haven)
 
 # task-specific preprocessing functions
-source("Code/R/0_Preprocessing/utils.R")
+source("Code/R/0_preprocessing/utils.R")
 
 # Data path and individual subject file names
 data_path <- "Data/0_Raw"
@@ -21,6 +21,9 @@ studies <- c(hedge, gawronski, ahn)
 headers <- list(Flanker = c("Block", "Trial", "Arrow", "Condition", "Correct", "RT"),
                 Stroop  = c("Block", "Trial", "Unused", "Condition", "Correct", "RT"),
                 Posner  = c("Block", "Trial", "SOA", "Condition", "Correct", "RT"))
+
+# minimum allowable RT in ms
+min_rt <- 0
 
 # Loop through each study-task pair
 long_data <- foreach(s=seq_along(studies)) %do% {
@@ -47,7 +50,8 @@ long_data <- foreach(s=seq_along(studies)) %do% {
         mutate(subj_num = i,
                Time = 2,
                Task = task_name)
-      tmp <- rbind(tmp_t1, tmp_t2)
+      tmp <- rbind(tmp_t1, tmp_t2) %>%
+        filter(RT > min_rt/1000)
       if (task_name=="Stopsignal") {
         tmp %>%
           mutate(Condition = ifelse(Condition == 1, 2, Condition))
@@ -101,7 +105,7 @@ long_data <- foreach(s=seq_along(studies)) %do% {
     tmp_t1 %>%
       bind_rows(tmp_t2) %>%
       select(subj_num, Time, RT, Block, Correct, Task) %>%
-      filter(Block %in% c(6,7,11,12) & RT > 0) %>%
+      filter(Block %in% c(6,7,11,12) & RT > min_rt) %>%
       # Treat "practice" and "test" trials as single blocks
       mutate(Condition = case_when(Block == 6 ~ 1,
                                    Block == 7 ~ 1,

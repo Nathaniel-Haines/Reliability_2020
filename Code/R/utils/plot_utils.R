@@ -1,3 +1,6 @@
+library(ggplot2)
+library(dplyr)
+
 rowSDs <- function(x, na.rm=T) {
   apply(x, 1, sd, na.rm = na.rm)
 }
@@ -20,12 +23,16 @@ plot_retest <- function(pars, parameter, task, samp_data, legend) {
   est3 <- switch(parameter,
                  "mu" = fits[[3]]$R_mu[,1,2],
                  "sig" = fits[[3]]$R_sigma[,1,2])
-  qplot() +
-    geom_density(aes(x = est3, fill = "Shifted Lognormal ")) +
-    geom_density(aes(x = est2, fill = "Lognormal "), alpha = .9) +
-    geom_density(aes(x = est1, fill = " Normal "), alpha = .7) +
-    scale_fill_manual(values = c("#edafaf", "#b5000c", "#700000"),
-                      labels = c(" Normal ", "Lognormal ", "Shifted Lognormal ")) +
+  est4 <- switch(parameter,
+                 "mu" = fits[[4]]$R_mu[,1,2],
+                 "sig" = fits[[4]]$R_sigma[,1,2])
+  ggplot() +
+    geom_density(aes(x = est4, fill = "Shifted Lognormal Mix")) +
+    geom_density(aes(x = est3, fill = "Shifted Lognormal "), alpha = .9) +
+    geom_density(aes(x = est2, fill = "Lognormal "), alpha = .7) +
+    geom_density(aes(x = est1, fill = " Normal "), alpha = .5) +
+    scale_fill_manual(values = c("#edafaf", "#A25050", "#b5000c", "#700000"),
+                      labels = c(" Normal ", "Lognormal ", "Shifted Lognormal ", "Shifted Lognormal Mix")) +
     geom_vline(xintercept = samp_cor$estimate, linetype = 2, size = 1) +
     geom_segment(aes(x = samp_cor$conf.int[1], xend = samp_cor$conf.int[2], y = 0, yend = 0), 
                  color = I("black"), size = 1.5) +
@@ -37,13 +44,15 @@ plot_retest <- function(pars, parameter, task, samp_data, legend) {
           legend.title = element_blank())
 }
 
-plot_RT <- function(pars, raw, subj, subjs, n_draws, xlim, ylim, legend) {
+plot_RT <- function(pars, raw, subj, subjs, xlim, ylim, legend) {
   color_scheme_set("red")
+  
   n_samples <- dim(pars$post_pred_c1_t1)[1]
   samp <- sample(1:n_samples, n_draws, F)
   
   pars1 <- pars$post_pred_c1_t1[samp,which(subj==subjs),]
   pars2 <- pars$post_pred_c2_t1[samp,which(subj==subjs),]
+  
   raw1 <- raw$RT[subj,1,1,]
   raw2 <- raw$RT[subj,2,1,]
   

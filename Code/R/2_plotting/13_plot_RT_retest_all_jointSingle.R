@@ -24,8 +24,7 @@ results <- foreach(d=data_names, .combine = "rbind") %do% {
   samp_data <- stan_data[[d]]
   tmp <- foreach(i=fit_names, .combine = "rbind") %do% {
     # Extract generative model estimates
-    pars <- rstan::extract(readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSingle_", i, ".rds")),
-                           pars = c("mu_i", "sigma_i"))
+    pars <- readRDS(paste0("Data/2_Fitted/fit_", d, "_jointSingle_", i, ".rds"))
     
     # Number of samples
     samps <- length(pars$mu_i[,1,1])
